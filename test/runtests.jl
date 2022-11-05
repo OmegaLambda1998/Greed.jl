@@ -1,6 +1,6 @@
-using REPLACE_PKG
+using Greed
 using Test
 
-@testset "REPLACE_PKG.jl" begin
+@testset "Greed.jl" begin
     # Write your tests here.
 end

@@ -1,11 +1,12 @@
-name = "REPLACE_PKG"
-uuid = "a50c839e-1b84-4575-b48f-4fda80ec5e07"
+name = "Greed"
+uuid = "7615e37d-26ac-4819-ad05-b1a0335b0fae"
 authors = ["Patrick Armstrong <patrick.armstrong@anu.edu.au> and contributors"]
 version = "0.1.0"
 
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
 OLUtils = "c0b1955d-4702-4680-a946-720482e78a48"
+OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 
 [compat]

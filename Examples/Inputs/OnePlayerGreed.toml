@@ -1,0 +1,26 @@
+[ global ]
+    output_path = "../Outputs/OnePlayerGreed"
+
+[ players ]
+    algorithms = ["PlayerAlgorithm", "PlayerAlgorithm"]
+    dice = ["$", "G", "R", "GE", "BE", "D"]
+
+[ game ]
+    start_score = 500
+    end_score = 5000
+    [ game.rules ]
+        111111 = 5000
+        222222 = 5000
+        333333 = 5000
+        444444 = 5000
+        555555 = 5000
+        666666 = 5000
+        123456 = 1000
+        6666 = 1000
+        111 = 600
+        222 = 500
+        333 = 400
+        444 = 300
+        555 = 300
+        6 = 100
+        2 = 50
