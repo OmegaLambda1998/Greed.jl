@@ -2,8 +2,13 @@
     output_path = "../Outputs/OnePlayerGreed"
 
 [ players ]
-    algorithms = ["PlayerAlgorithm", "PlayerAlgorithm"]
     dice = ["$", "G", "R", "GE", "BE", "D"]
+
+    [[ players.algorithms ]]
+        name = "PlayerAlgorithm"
+    
+    [[ players.algorithms ]]
+        name = "PlayerAlgorithm"
 
 [ game ]
     start_score = 500

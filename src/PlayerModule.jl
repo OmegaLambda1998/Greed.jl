@@ -2,6 +2,8 @@ module PlayerModule
 
 # External imports
 using OrderedCollections
+using TOML
+using Base
 
 # Internal imports
 using ..DiceModule
@@ -24,7 +26,12 @@ mutable struct Player
     bank::Vector{Int}
     draw::Vector{Int}
     score::Int
+    scoring::Bool
     algorithm::GreedAlgorithm
+end
+
+function Base.deepcopy(player::Player)
+    return Player(player.name, player.dice, copy(player.hand), copy(player.bank), copy(player.draw), player.score, player.scoring, deepcopy(player.algorithm))
 end
 
 # Load in all algorithms 
@@ -38,7 +45,8 @@ for path in readdir(algorithms_path, join=true)
     end
 end
 
-function get_algorithm(type::String)
+function get_algorithm(algorithm_details::Dict)
+    type = algorithm_details["name"]
     try
         algorithm = getfield(PlayerModule, Symbol(type))
     catch e
@@ -50,12 +58,18 @@ function get_players(config::Dict, global_config::Dict)
     dice_rules = config["dice"]
     dice = Dice(dice_rules)
     hand = [dice for i in 1:length(dice.faces)]
-    algorithms = [get_algorithm(a)() for a in config["algorithms"]]
+    if "algorithm_file" in keys(config)
+        algorithm_path = joinpath(global_config["base_path"], config["algorithm_file"])
+        @info "Loading in algorithms from $algorithm_path"
+        algorithm_dict = TOML.parsefile(algorithm_path)["algorithms"]
+        config["algorithms"] = algorithm_dict
+    end
+    algorithms = [get_algorithm(a)(get(a, "options", Dict())) for a in config["algorithms"]]
     names = get(config, "names", nothing)
     if isnothing(names)
-        names = ["Player $i" for i in 1:length(algorithms)]
+        names = [get_name(algorithms[i], i) for i in 1:length(algorithms)]
     end
-    players = [Player(names[i], dice, hand, Vector{Int}(), Vector{Int}(), 0, algorithms[i]) for i in 1:length(algorithms)]
+    players = [Player(names[i], dice, hand, Vector{Int}(), Vector{Int}(), 0, false, algorithms[i]) for i in 1:length(algorithms)]
     return players
 end
 
@@ -75,32 +89,37 @@ end
 function turn!(p::Player, rules::OrderedDict{Vector{Int}, Int}, min_score::Int64)
     dice = p.dice
     roll!(p)
-    println("$(p.name) rolled $([dice.faces[d] for d in p.draw])")
+    @info "$(p.name) rolled $([dice.faces[d] for d in p.draw])"
     opts = options(rules, p)
     if length(opts) == 0
-        println("Bad luck $(p.name), you didn't roll any options\n")
+        @info "Bad luck $(p.name), you didn't roll any options\n"
     else
         s = score(rules, p.bank)
-        println("$(p.name) has options:")
-        println("[1]: Bank => $([dice.faces[d] for d in p.bank]), Score => $s")
+        @info "$(p.name) has options:"
+        @info "[1]: Bank => $([dice.faces[d] for d in p.bank]), Score => $s"
         for (i, opt) in enumerate(opts)
             s = score(rules, opt[1])
-            println("[$(i + 1)]: Bank => $([dice.faces[d] for d in opt[1]]), Score => $s, $(length(p.dice.faces) - length(opt[1])) dice leftover")
+            @info "[$(i + 1)]: Bank => $([dice.faces[d] for d in opt[1]]), Score => $s, $(length(p.dice.faces) - length(opt[1])) dice leftover"
         end
-        choice, reroll = choose(p.algorithm, p, opts, rules)
+        choice, reroll = choose(p.algorithm, p, opts, rules, min_score)
         if choice != 1
             p.bank = collect(keys(opts))[choice - 1]
             p.hand = [dice for i in 1:(length(p.dice.faces) - length(p.bank))]
+        end
+        if length(p.hand) == 0
+            @info "You've run out of dice, you're all done!"
+            reroll = false
         end
         s = score(rules, p.bank)
         if reroll
             turn!(p, rules, min_score)
         else
             if (p.score >= min_score) || (s >= min_score)
+                p.scoring = true
                 p.score += s
-                println("$(p.name) has gained $s points, bringing them up to $(p.score) points total\n")
+                @info "$(p.name) has gained $s points, bringing them up to $(p.score) points total\n"
             else
-                println("Sorry $(p.name) you need to earn at least $min_score in a single turn to start earning points\n")
+                @info "Sorry $(p.name) you need to earn at least $min_score in a single turn to start earning points\n"
             end
         end
     end

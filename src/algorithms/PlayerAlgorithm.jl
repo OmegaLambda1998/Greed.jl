@@ -2,7 +2,19 @@ export PlayerAlgorithm
 
 struct PlayerAlgorithm <: GreedAlgorithm end
 
-function choose(algorithm::PlayerAlgorithm, player::Player, opts::OrderedDict{Vector{Int}, Vector{Int}}, rules::OrderedDict{Vector{Int}, Int})
+function PlayerAlgorithm(options::Dict)
+    return PlayerAlgorithm()
+end
+
+function get_name(algorithm::PlayerAlgorithm, i::Int64)
+    return "Player $i"
+end
+
+function deepcopy(algorithm::PlayerAlgorithm)
+    return PlayerAlgorithm()
+end
+
+function choose(algorithm::PlayerAlgorithm, player::Player, opts::OrderedDict{Vector{Int}, Vector{Int}}, rules::OrderedDict{Vector{Int}, Int}, min_score::Int64)
     if length(opts) == 0
         println("Bad luck $(player.name), you didn't roll any options")
         return (1, false)
