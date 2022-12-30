@@ -88,16 +88,37 @@ function plot_gauntlet(gauntlet::Gauntlet, plot_dir::AbstractString)
         end
     end
     Z ./= gauntlet.num_games
-    fig, ax, hm = heatmap(X, Y, Z; colormap=:RdBu, colorrange=(-maximum(Z), maximum(Z)))
+    scores = Vector{Float64}()
+    names = Vector{String}()
+    for i in x
+        mask = [x == i for x in X]
+        z = Z[mask]
+        score = sum(z) / length(z)
+        push!(scores, score)
+        n = names_1[i]
+        push!(names, n)
+    end
+    mask = sortperm(scores, rev=true)
+    scores = scores[mask]
+    names = names[mask]
+    println("$(collect(zip(names, scores)))")
+    colorrange = (-1, 1)
+    fig, ax, hm = heatmap(X, Y, Z; colormap=:RdBu, colorrange=colorrange)
     for i in 1:length(X)
-        txtcol = abs(Z[i]) < 0.25 ? :black : :white
-        text!(ax, "$(Z[i])", position = (X[i], Y[i]), align = (:center, :center), color = txtcol) 
+        txtcol = abs(Z[i]) < 0.5 ? :black : :white
+        text!(ax, "$(round(Z[i]; digits=1))", position = (X[i], Y[i]), align = (:center, :center), color = txtcol) 
     end
     xticks = [n[1:end-2] for n in names_1]
     yticks = [n[1:end-2] for n in names_2]
     ax.xticks = (x, xticks)
+    ax.xticklabelcolor = :blue
     ax.xticklabelrotation = 45.0
+    ax.xlabel = "First Player"
+    ax.xlabelcolor = :blue
     ax.yticks = (y, yticks)
+    ax.yticklabelcolor = :red
+    ax.ylabel = "Second Player"
+    ax.ylabelcolor = :red
     Colorbar(fig[:, end+1], hm, label = "x score - y score")
     save(joinpath(plot_dir, "Gauntlet.svg"), fig)
 end

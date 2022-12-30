@@ -16,18 +16,20 @@ mutable struct Game
     rules::OrderedDict{Vector{Int}, Int}
     start_score::Int64
     end_score::Int64
+    max_rounds::Int64
     players::Vector{Player}
 end
 
 function Base.deepcopy(game::Game)
-    return Game(game.rules, game.start_score, game.end_score, [deepcopy(p) for p in game.players])
+    return Game(game.rules, game.start_score, game.end_score, game.max_rounds, [deepcopy(p) for p in game.players])
 end
 
 function Game(config::Dict, players::Vector{Player}, global_config::Dict)
     rules = parse_rules(config["rules"])
     start_score = config["start_score"]
     end_score = config["end_score"]
-    return Game(rules, start_score, end_score, players)
+    max_rounds = get(config, "max_rounds", 100)
+    return Game(rules, start_score, end_score, max_rounds, players)
 end
 
 function parse_rules(rules::Dict)
@@ -49,7 +51,8 @@ function victory(game::Game)
     return winners
 end
 
-function run_game(game::Game)
+function run_game(game::Game, rounds=0)
+    rounds += 1
     winners = victory(game)
     if length(winners) > 0
         for i in keys(winners)
@@ -63,6 +66,10 @@ function run_game(game::Game)
         end
         return winners
     end
+    if rounds > game.max_rounds
+        @info "No winners at all, maximum number of rounds reached, quitting"
+        return winners
+    end
     @info "No winners yet\n"
     for player in game.players
         @info "$(player.name)'s turn\n"
@@ -74,7 +81,7 @@ function run_game(game::Game)
         reset!(player)
     end
     @info "*********"
-    return run_game(game)
+    return run_game(game, rounds)
 end
 
 end

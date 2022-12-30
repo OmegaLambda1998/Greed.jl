@@ -1,38 +1,28 @@
 [ global ]
-    output_path = "../../Outputs/Gauntlet"
+    output_path = "../Outputs/Debug"
 
 [ players ]
     dice = ["$", "G", "R", "GE", "BE", "D"]
 
     [[ players.algorithms ]]
-        name = "MinScore"
+        name = "NumRoll"
         [ players.algorithms.options ]
-            min_score = 50
+            num_roll = 1
 
     [[ players.algorithms ]]
-        name = "MinScore"
+        name = "NumRoll"
         [ players.algorithms.options ]
-            min_score = 100
+            num_roll = 3
 
     [[ players.algorithms ]]
-        name = "MinScore"
+        name = "NumRoll"
         [ players.algorithms.options ]
-            min_score = 200
+            num_roll = 5
 
     [[ players.algorithms ]]
-        name = "MinScore"
+        name = "NumRoll"
         [ players.algorithms.options ]
-            min_score = 300
-
-    [[ players.algorithms ]]
-        name = "MinScore"
-        [ players.algorithms.options ]
-            min_score = 400
-
-    [[ players.algorithms ]]
-        name = "MinScore"
-        [ players.algorithms.options ]
-            min_score = 500
+            num_roll = 6
 
 [ game ]
     start_score = 500
@@ -53,6 +43,3 @@
         555 = 300
         6 = 100
         2 = 50
-
-[ gauntlet ]
-    num_games = 10000

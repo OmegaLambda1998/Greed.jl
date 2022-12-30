@@ -16,7 +16,6 @@ end
 
 function choose(algorithm::PlayerAlgorithm, player::Player, opts::OrderedDict{Vector{Int}, Vector{Int}}, rules::OrderedDict{Vector{Int}, Int}, min_score::Int64)
     if length(opts) == 0
-        println("Bad luck $(player.name), you didn't roll any options")
         return (1, false)
     end
     choices = string.(collect(1:length(opts) + 1))

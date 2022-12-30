@@ -2,6 +2,7 @@ module PlayerModule
 
 # External imports
 using OrderedCollections
+using Random
 using TOML
 using Base
 
@@ -93,34 +94,33 @@ function turn!(p::Player, rules::OrderedDict{Vector{Int}, Int}, min_score::Int64
     opts = options(rules, p)
     if length(opts) == 0
         @info "Bad luck $(p.name), you didn't roll any options\n"
+    end
+    s = score(rules, p.bank)
+    @info "$(p.name) has options:"
+    @info "[1]: Bank => $([dice.faces[d] for d in p.bank]), Score => $s"
+    for (i, opt) in enumerate(opts)
+        s = score(rules, opt[1])
+        @info "[$(i + 1)]: Bank => $([dice.faces[d] for d in opt[1]]), Score => $s, $(length(p.dice.faces) - length(opt[1])) dice leftover"
+    end
+    choice, reroll = choose(p.algorithm, p, opts, rules, min_score)
+    if choice != 1
+        p.bank = collect(keys(opts))[choice - 1]
+        p.hand = [dice for i in 1:(length(p.dice.faces) - length(p.bank))]
+    end
+    if length(p.hand) == 0
+        @info "You've run out of dice, you're all done!"
+        reroll = false
+    end
+    s = score(rules, p.bank)
+    if reroll
+        turn!(p, rules, min_score)
     else
-        s = score(rules, p.bank)
-        @info "$(p.name) has options:"
-        @info "[1]: Bank => $([dice.faces[d] for d in p.bank]), Score => $s"
-        for (i, opt) in enumerate(opts)
-            s = score(rules, opt[1])
-            @info "[$(i + 1)]: Bank => $([dice.faces[d] for d in opt[1]]), Score => $s, $(length(p.dice.faces) - length(opt[1])) dice leftover"
-        end
-        choice, reroll = choose(p.algorithm, p, opts, rules, min_score)
-        if choice != 1
-            p.bank = collect(keys(opts))[choice - 1]
-            p.hand = [dice for i in 1:(length(p.dice.faces) - length(p.bank))]
-        end
-        if length(p.hand) == 0
-            @info "You've run out of dice, you're all done!"
-            reroll = false
-        end
-        s = score(rules, p.bank)
-        if reroll
-            turn!(p, rules, min_score)
+        if (p.score >= min_score) || (s >= min_score)
+            p.scoring = true
+            p.score += s
+            @info "$(p.name) has gained $s points, bringing them up to $(p.score) points total\n"
         else
-            if (p.score >= min_score) || (s >= min_score)
-                p.scoring = true
-                p.score += s
-                @info "$(p.name) has gained $s points, bringing them up to $(p.score) points total\n"
-            else
-                @info "Sorry $(p.name) you need to earn at least $min_score in a single turn to start earning points\n"
-            end
+            @info "Sorry $(p.name) you need to earn at least $min_score in a single turn to start earning points\n"
         end
     end
 end
