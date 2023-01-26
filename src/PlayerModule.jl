@@ -47,7 +47,7 @@ for path in readdir(algorithms_path, join=true)
 end
 
 function get_algorithm(algorithm_details::Dict)
-    type = algorithm_details["name"]
+    type = algorithm_details["NAME"]
     try
         algorithm = getfield(PlayerModule, Symbol(type))
     catch e
@@ -56,17 +56,17 @@ function get_algorithm(algorithm_details::Dict)
 end
 
 function get_players(config::Dict, global_config::Dict)
-    dice_rules = config["dice"]
+    dice_rules = config["DICE"]
     dice = Dice(dice_rules)
     hand = [dice for i in 1:length(dice.faces)]
     if "algorithm_file" in keys(config)
-        algorithm_path = joinpath(global_config["base_path"], config["algorithm_file"])
+        algorithm_path = joinpath(global_config["BASE_PATH"], config["ALGORITHM_FILE"])
         @info "Loading in algorithms from $algorithm_path"
-        algorithm_dict = TOML.parsefile(algorithm_path)["algorithms"]
-        config["algorithms"] = algorithm_dict
+        algorithm_dict = TOML.parsefile(algorithm_path)["ALGORITHMS"]
+        config["ALGORITHMS"] = algorithm_dict
     end
-    algorithms = [get_algorithm(a)(get(a, "options", Dict())) for a in config["algorithms"]]
-    names = get(config, "names", nothing)
+    algorithms = [get_algorithm(a)(get(a, "OPTIONS", Dict())) for a in config["ALGORITHMS"]]
+    names = get(config, "NAMES", nothing)
     if isnothing(names)
         names = [get_name(algorithms[i], i) for i in 1:length(algorithms)]
     end

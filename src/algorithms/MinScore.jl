@@ -5,7 +5,7 @@ struct MinScore <: GreedAlgorithm
 end
 
 function MinScore(options::Dict)
-    min_score = options["min_score"]
+    min_score = options["MIN_SCORE"]
     return MinScore(min_score)
 end
 

@@ -6,7 +6,7 @@ mutable struct NumRoll <: GreedAlgorithm
 end
 
 function NumRoll(options::Dict)
-    num_roll = options["num_roll"]
+    num_roll = options["NUM_ROLL"]
     return NumRoll(num_roll, 0)
 end
 

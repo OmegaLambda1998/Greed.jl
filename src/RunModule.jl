@@ -18,21 +18,21 @@ using .GauntletModule
 export run_Greed
 
 function get_game(config::Dict, players::Vector{Player}, global_config::Dict)
-    rules = parse_rules(config["rules"])
-    start_score = config["start_score"]
-    end_score = config["end_score"]
+    rules = parse_rules(config["RULES"])
+    start_score = config["START_SCORE"]
+    end_score = config["END_SCORE"]
     return Game(rules, start_score, end_score, players)
 end
 
 function run_Greed(toml::Dict)
-    global_config = toml["global"]
-    seed = get(toml, "seed", 0000)
+    global_config = toml["GLOBAL"]
+    seed = get(toml, "SEED", 0000)
     Random.seed!(seed)
-    gauntlet = get(toml, "gauntlet", nothing)
-    players = get_players(toml["players"], global_config)
+    gauntlet = get(toml, "GAUNTLET", nothing)
+    players = get_players(toml["PLAYERS"], global_config)
     if isnothing(gauntlet)
         @info "Players: $(join([p.name for p in players], ", ", " and "))\n"
-        game = get_game(toml["game"], players, global_config)
+        game = get_game(toml["GAME"], players, global_config)
         run_game(game)
     else
         gauntlet_players = Vector{Vector{Player}}()
@@ -47,11 +47,11 @@ function run_Greed(toml::Dict)
         end
         gauntlet_games = Vector{Game}()
         for p in gauntlet_players
-            game = Game(toml["game"], p, global_config)
+            game = Game(toml["GAME"], p, global_config)
             push!(gauntlet_games, game)
         end
         order = [p.name for p in players]
-        gauntlet = Gauntlet(toml["gauntlet"], gauntlet_games, order, global_config)
+        gauntlet = Gauntlet(toml["GAUNTLET"], gauntlet_games, order, global_config)
         run_gauntlet(gauntlet, global_config)
     end
 end

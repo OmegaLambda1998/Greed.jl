@@ -39,7 +39,6 @@ function main()
     verbose = args["verbose"]
     toml_path = args["input"]
     input = setup_input(toml_path, verbose)
-    @show input
     run_Greed(input)
 end
 

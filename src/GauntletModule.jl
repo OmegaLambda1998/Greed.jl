@@ -21,7 +21,7 @@ mutable struct Gauntlet
 end
 
 function Gauntlet(config::Dict, games::Vector{Game}, order::Vector{String}, global_config::Dict)
-    num_games = config["num_games"]
+    num_games = config["NUM_GAMES"]
     results = OrderedDict{Int64, OrderedDict{String, Int64}}()
     for i in 1:length(games)
         results[i] = OrderedDict{String, Int64}()
@@ -60,7 +60,7 @@ function run_gauntlet(gauntlet::Gauntlet, global_config::Dict)
         end
         next!(p)
     end
-    plot_gauntlet(gauntlet, global_config["output_path"])
+    plot_gauntlet(gauntlet, global_config["OUTPUT_PATH"])
 end
 
 function plot_gauntlet(gauntlet::Gauntlet, plot_dir::AbstractString)

@@ -25,10 +25,10 @@ function Base.deepcopy(game::Game)
 end
 
 function Game(config::Dict, players::Vector{Player}, global_config::Dict)
-    rules = parse_rules(config["rules"])
-    start_score = config["start_score"]
-    end_score = config["end_score"]
-    max_rounds = get(config, "max_rounds", 100)
+    rules = parse_rules(config["RULES"])
+    start_score = config["START_SCORE"]
+    end_score = config["END_SCORE"]
+    max_rounds = get(config, "MAX_ROUNDS", 100)
     return Game(rules, start_score, end_score, max_rounds, players)
 end
 
